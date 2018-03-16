@@ -1,0 +1,6 @@
+apiVersion: foldingbeauty.io/v1
+kind: Database
+metadata:
+  name: my-database
+spec:
+  user: my-user
