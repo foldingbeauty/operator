@@ -13,6 +13,7 @@ func (in *Miner) DeepCopyInto(out *Miner) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
 	in.ObjectMeta.DeepCopyInto(&out.ObjectMeta)
+	in.Status.DeepCopyInto(&out.Status)
 	out.Spec = in.Spec
 	return
 }

@@ -10,10 +10,10 @@ import (
 
 // Miner describes a Miner.
 type Miner struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec MinerSpec `json:"spec"`
+	metav1.TypeMeta   	`json:",inline"`
+	metav1.ObjectMeta 	`json:"metadata,omitempty"`
+	metav1.Status 		`json:"metadata,omitempty"`
+	Spec MinerSpec 		`json:"spec"`
 }
 
 // MinerSpec is the spec for a Foo resource

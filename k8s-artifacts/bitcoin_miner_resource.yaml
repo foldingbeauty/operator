@@ -3,6 +3,6 @@ kind: Miner
 metadata:
   name: bitcoin-miner-gpu
 spec:
-  kind: bitcoin2
-  gpu: false
-  replicas: 20
+  kind: gulden # [bitcoin litecoin gulden ether]
+  gpu: false # use GPU acceleration
+  replicas: 5 # total number of miners [1 .. 10]

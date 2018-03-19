@@ -32,21 +32,26 @@ import (
 	"k8s.io/client-go/util/workqueue"
 
 	// client set and resource types taken from generated code
+	//metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	foldingbeautyv1 "github.com/foldingbeauty/operator/pkg/apis/foldingbeauty.io/v1"
 	foldingbeautyclienset "github.com/foldingbeauty/operator/pkg/client/clientset/versioned"
+	foldingbeatyv1types "github.com/foldingbeauty/operator/pkg/client/clientset/versioned/typed/foldingbeauty.io/v1"
+
 )
 
 type Controller struct {
 	indexer  cache.Indexer
 	queue    workqueue.RateLimitingInterface
 	informer cache.Controller
+	updater	foldingbeatyv1types.MinerInterface
 }
 
-func NewController(queue workqueue.RateLimitingInterface, indexer cache.Indexer, informer cache.Controller) *Controller {
+func NewController(queue workqueue.RateLimitingInterface, indexer cache.Indexer, informer cache.Controller, updater foldingbeatyv1types.MinerInterface) *Controller {
 	return &Controller{
 		informer: informer,
 		indexer:  indexer,
 		queue:    queue,
+		updater: updater,
 	}
 }
 
@@ -60,6 +65,8 @@ func (c *Controller) processNextItem() bool {
 	// This allows safe parallel processing because two miners with the same key are never processed in
 	// parallel.
 	defer c.queue.Done(key)
+
+	glog.Infof("KeyXX of Miner %s", key.(string))
 
 	// Invoke the method containing the business logic
 	err := c.manageMiners(key.(string))
@@ -85,12 +92,19 @@ func (c *Controller) manageMiners(key string) error {
 	} else {
 		// Note that you also have to check the uid if you have a local controlled resource, which
 		// is dependent on the actual instance, to detect that a Pod was recreated with the same name
-		glog.Infof("Received a Sync/Add/Update event for Miner %s\n", obj.(*foldingbeautyv1.Miner).GetName())
-		glog.Infof("Miner %s will mine for %s\n", obj.(*foldingbeautyv1.Miner).GetName(), obj.(*foldingbeautyv1.Miner).Spec.Kind)
-		glog.Infof("Miner %s GPU enabled is %t\n", obj.(*foldingbeautyv1.Miner).GetName(), obj.(*foldingbeautyv1.Miner).Spec.Gpu)
-		glog.Infof("We need %d Miner(s)\n", obj.(*foldingbeautyv1.Miner).Spec.Replicas)
+		miner := obj.(*foldingbeautyv1.Miner)
 
-		
+		glog.Infof("Received a Sync/Add/Update event for Miner %s\n", miner.GetName())
+		glog.Infof("Miner %s will mine for %s\n", miner.GetName(), miner.Spec.Kind)
+		glog.Infof("Miner %s GPU enabled is %t\n", miner.GetName(), miner.Spec.Gpu)
+		glog.Infof("We need %d Miner(s)\n", miner.Spec.Replicas)
+		/*
+		miner.Status.Status = metav1.StatusSuccess
+		_, err := c.updater.Update(miner)
+		if err != nil {
+			glog.Errorf("Updating object with key %s from store failed with %v", key, err)
+			return err
+		}*/
 	}
 	return nil
 }
@@ -169,7 +183,10 @@ func main() {
 		glog.Fatal(err)
 	}
 
-	// create the pod watcher
+	// create miner updater
+	updater := clientset.FoldingbeautyV1().Miners("default")
+
+	// create the miner watcher
 	MinerListWatcher := cache.NewListWatchFromClient(clientset.FoldingbeautyV1().RESTClient(), "Miners", v1.NamespaceDefault, fields.Everything())
 
 	// create the workqueue
@@ -202,7 +219,7 @@ func main() {
 		},
 	}, cache.Indexers{})
 
-	controller := NewController(queue, indexer, informer)
+	controller := NewController(queue, indexer, informer, updater)
 
 	// Now let's start the controller
 	stop := make(chan struct{})
