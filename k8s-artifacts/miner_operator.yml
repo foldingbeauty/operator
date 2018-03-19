@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: miner-operator
-        image: operator:0.1.3
+        image: operator:0.1.4
         command: ["./operator","--logtostderr"]
         imagePullPolicy: Never
  

@@ -32,7 +32,7 @@ import (
 	"k8s.io/client-go/util/workqueue"
 
 	// client set and resource types taken from generated code
-	//metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	foldingbeautyv1 "github.com/foldingbeauty/operator/pkg/apis/foldingbeauty.io/v1"
 	foldingbeautyclienset "github.com/foldingbeauty/operator/pkg/client/clientset/versioned"
 	foldingbeatyv1types "github.com/foldingbeauty/operator/pkg/client/clientset/versioned/typed/foldingbeauty.io/v1"
@@ -66,8 +66,6 @@ func (c *Controller) processNextItem() bool {
 	// parallel.
 	defer c.queue.Done(key)
 
-	glog.Infof("KeyXX of Miner %s", key.(string))
-
 	// Invoke the method containing the business logic
 	err := c.manageMiners(key.(string))
 	// Handle the error if something went wrong during the execution of the business logic
@@ -98,13 +96,12 @@ func (c *Controller) manageMiners(key string) error {
 		glog.Infof("Miner %s will mine for %s\n", miner.GetName(), miner.Spec.Kind)
 		glog.Infof("Miner %s GPU enabled is %t\n", miner.GetName(), miner.Spec.Gpu)
 		glog.Infof("We need %d Miner(s)\n", miner.Spec.Replicas)
-		/*
 		miner.Status.Status = metav1.StatusSuccess
 		_, err := c.updater.Update(miner)
 		if err != nil {
 			glog.Errorf("Updating object with key %s from store failed with %v", key, err)
 			return err
-		}*/
+		}
 	}
 	return nil
 }

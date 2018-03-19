@@ -12,7 +12,7 @@ import (
 type Miner struct {
 	metav1.TypeMeta   	`json:",inline"`
 	metav1.ObjectMeta 	`json:"metadata,omitempty"`
-	metav1.Status 		`json:"metadata,omitempty"`
+	metav1.Status 		`json:"status,omitempty"`
 	Spec MinerSpec 		`json:"spec"`
 }
 
