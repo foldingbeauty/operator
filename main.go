@@ -31,8 +31,9 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/workqueue"
 
-	foldingbeautyclienset "github.com/foldingbeauty/operator/pkg/client/clientset/versioned"
+	// client set and resource types taken from generated code
 	foldingbeautyv1 "github.com/foldingbeauty/operator/pkg/apis/foldingbeauty.io/v1"
+	foldingbeautyclienset "github.com/foldingbeauty/operator/pkg/client/clientset/versioned"
 )
 
 type Controller struct {
@@ -79,11 +80,11 @@ func (c *Controller) syncToStdout(key string) error {
 
 	if !exists {
 		// Below we will warm up our cache with a Database, so that we will see a delete for one Database
-		fmt.Printf("Database %s does not exist anymore\n", key)
+		glog.Infof("Database %s does not exist anymore\n", key)
 	} else {
 		// Note that you also have to check the uid if you have a local controlled resource, which
 		// is dependent on the actual instance, to detect that a Pod was recreated with the same name
-		fmt.Printf("Sync/Add/Update for Database %s\n", obj.(*foldingbeautyv1.Database).GetName())
+		glog.Infof("Sync/Add/Update for Database %s\n", obj.(*foldingbeautyv1.Database).GetName())
 	}
 	return nil
 }
@@ -196,7 +197,6 @@ func main() {
 	}, cache.Indexers{})
 
 	controller := NewController(queue, indexer, informer)
-
 
 	// Now let's start the controller
 	stop := make(chan struct{})

@@ -1,0 +1,8 @@
+# start with a scratch (no layers)
+FROM alpine:3.5
+
+# copy our static linked library
+COPY operator operator
+
+# run it!
+CMD ["./operator"]

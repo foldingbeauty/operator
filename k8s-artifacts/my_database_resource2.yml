@@ -1,6 +1,0 @@
-apiVersion: foldingbeauty.io/v1
-kind: Database
-metadata:
-  name: my-second-database
-spec:
-  user: another2

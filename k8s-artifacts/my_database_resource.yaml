@@ -3,4 +3,4 @@ kind: Database
 metadata:
   name: my-database
 spec:
-  user: my-user
+  user: my-user2
