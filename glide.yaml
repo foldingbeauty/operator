@@ -2,5 +2,4 @@ package: .
 import:
 - package: k8s.io/client-go
   version: v6.0.0
-- package: github.com/kubernetes/code-generator
 - package: k8s.io/code-generator
