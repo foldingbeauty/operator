@@ -18,6 +18,7 @@ type Miner struct {
 
 // MinerSpec is the spec for a Foo resource
 type MinerSpec struct {
+	Replicas int `json:"replicas"`
 	Kind    string `json:"kind"`
 	Gpu 	bool `json:"gpu"`
 }
@@ -28,6 +29,5 @@ type MinerSpec struct {
 type MinerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-
 	Items []Miner `json:"items"`
 }

@@ -68,10 +68,11 @@ func (c *Controller) processNextItem() bool {
 	return true
 }
 
-// syncToStdout is the business logic of the controller. 
+// manageMiners is the business logic of the controller. 
 // In case an error happened, it has to simply return the error.
 // The retry logic should not be part of the business logic.
 func (c *Controller) manageMiners(key string) error {
+	glog.Infof("Key of Miner %s", key)
 	obj, exists, err := c.indexer.GetByKey(key)
 	if err != nil {
 		glog.Errorf("Fetching object with key %s from store failed with %v", key, err)
@@ -87,6 +88,7 @@ func (c *Controller) manageMiners(key string) error {
 		glog.Infof("Received a Sync/Add/Update event for Miner %s\n", obj.(*foldingbeautyv1.Miner).GetName())
 		glog.Infof("Miner %s will mine for %s\n", obj.(*foldingbeautyv1.Miner).GetName(), obj.(*foldingbeautyv1.Miner).Spec.Kind)
 		glog.Infof("Miner %s GPU enabled is %t\n", obj.(*foldingbeautyv1.Miner).GetName(), obj.(*foldingbeautyv1.Miner).Spec.Gpu)
+		glog.Infof("We need %d Miner(s)\n", obj.(*foldingbeautyv1.Miner).Spec.Replicas)
 
 		
 	}

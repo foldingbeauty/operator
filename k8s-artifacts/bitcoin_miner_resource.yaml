@@ -3,5 +3,6 @@ kind: Miner
 metadata:
   name: bitcoin-miner-gpu
 spec:
-  kind: bitcoin
+  kind: bitcoin2
   gpu: false
+  replicas: 20
