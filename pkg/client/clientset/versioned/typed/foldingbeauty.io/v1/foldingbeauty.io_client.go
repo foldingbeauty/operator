@@ -11,7 +11,7 @@ import (
 
 type FoldingbeautyV1Interface interface {
 	RESTClient() rest.Interface
-	DatabasesGetter
+	MinersGetter
 }
 
 // FoldingbeautyV1Client is used to interact with features provided by the foldingbeauty.io group.
@@ -19,8 +19,8 @@ type FoldingbeautyV1Client struct {
 	restClient rest.Interface
 }
 
-func (c *FoldingbeautyV1Client) Databases(namespace string) DatabaseInterface {
-	return newDatabases(c, namespace)
+func (c *FoldingbeautyV1Client) Miners(namespace string) MinerInterface {
+	return newMiners(c, namespace)
 }
 
 // NewForConfig creates a new FoldingbeautyV1Client for the given config.

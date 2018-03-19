@@ -2,10 +2,10 @@
 
 package v1
 
-// DatabaseListerExpansion allows custom methods to be added to
-// DatabaseLister.
-type DatabaseListerExpansion interface{}
+// MinerListerExpansion allows custom methods to be added to
+// MinerLister.
+type MinerListerExpansion interface{}
 
-// DatabaseNamespaceListerExpansion allows custom methods to be added to
-// DatabaseNamespaceLister.
-type DatabaseNamespaceListerExpansion interface{}
+// MinerNamespaceListerExpansion allows custom methods to be added to
+// MinerNamespaceLister.
+type MinerNamespaceListerExpansion interface{}

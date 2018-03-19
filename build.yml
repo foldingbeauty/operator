@@ -7,7 +7,7 @@ build:
       artifacts:
         - /go/src/github.com/foldingbeauty/operator/operator
     production:
-      name: operator:0.1.1
+      name: operator:0.1.2
       dockerfile: Dockerfile.production
       depends_on:
         - builder

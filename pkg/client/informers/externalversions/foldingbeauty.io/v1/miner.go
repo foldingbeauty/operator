@@ -15,59 +15,59 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// DatabaseInformer provides access to a shared informer and lister for
-// Databases.
-type DatabaseInformer interface {
+// MinerInformer provides access to a shared informer and lister for
+// Miners.
+type MinerInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1.DatabaseLister
+	Lister() v1.MinerLister
 }
 
-type databaseInformer struct {
+type minerInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewDatabaseInformer constructs a new informer for Database type.
+// NewMinerInformer constructs a new informer for Miner type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewDatabaseInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredDatabaseInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewMinerInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredMinerInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredDatabaseInformer constructs a new informer for Database type.
+// NewFilteredMinerInformer constructs a new informer for Miner type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredDatabaseInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredMinerInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options meta_v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.FoldingbeautyV1().Databases(namespace).List(options)
+				return client.FoldingbeautyV1().Miners(namespace).List(options)
 			},
 			WatchFunc: func(options meta_v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.FoldingbeautyV1().Databases(namespace).Watch(options)
+				return client.FoldingbeautyV1().Miners(namespace).Watch(options)
 			},
 		},
-		&foldingbeauty_io_v1.Database{},
+		&foldingbeauty_io_v1.Miner{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *databaseInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredDatabaseInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *minerInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredMinerInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *databaseInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&foldingbeauty_io_v1.Database{}, f.defaultInformer)
+func (f *minerInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&foldingbeauty_io_v1.Miner{}, f.defaultInformer)
 }
 
-func (f *databaseInformer) Lister() v1.DatabaseLister {
-	return v1.NewDatabaseLister(f.Informer().GetIndexer())
+func (f *minerInformer) Lister() v1.MinerLister {
+	return v1.NewMinerLister(f.Informer().GetIndexer())
 }

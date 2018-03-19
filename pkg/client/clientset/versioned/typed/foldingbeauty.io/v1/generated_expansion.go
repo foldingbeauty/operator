@@ -2,4 +2,4 @@
 
 package v1
 
-type DatabaseExpansion interface{}
+type MinerExpansion interface{}

@@ -1,0 +1,7 @@
+apiVersion: foldingbeauty.io/v1
+kind: Miner
+metadata:
+  name: bitcoin-miner-gpu
+spec:
+  kind: bitcoin
+  gpu: false

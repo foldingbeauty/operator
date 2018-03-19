@@ -12,8 +12,8 @@ type FakeFoldingbeautyV1 struct {
 	*testing.Fake
 }
 
-func (c *FakeFoldingbeautyV1) Databases(namespace string) v1.DatabaseInterface {
-	return &FakeDatabases{c, namespace}
+func (c *FakeFoldingbeautyV1) Miners(namespace string) v1.MinerInterface {
+	return &FakeMiners{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

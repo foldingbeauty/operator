@@ -57,21 +57,21 @@ func (c *Controller) processNextItem() bool {
 		return false
 	}
 	// Tell the queue that we are done with processing this key. This unblocks the key for other workers
-	// This allows safe parallel processing because two pods with the same key are never processed in
+	// This allows safe parallel processing because two miners with the same key are never processed in
 	// parallel.
 	defer c.queue.Done(key)
 
 	// Invoke the method containing the business logic
-	err := c.syncToStdout(key.(string))
+	err := c.manageMiners(key.(string))
 	// Handle the error if something went wrong during the execution of the business logic
 	c.handleErr(err, key)
 	return true
 }
 
-// syncToStdout is the business logic of the controller. In this controller it simply prints
-// information about the pod to stdout. In case an error happened, it has to simply return the error.
+// syncToStdout is the business logic of the controller. 
+// In case an error happened, it has to simply return the error.
 // The retry logic should not be part of the business logic.
-func (c *Controller) syncToStdout(key string) error {
+func (c *Controller) manageMiners(key string) error {
 	obj, exists, err := c.indexer.GetByKey(key)
 	if err != nil {
 		glog.Errorf("Fetching object with key %s from store failed with %v", key, err)
@@ -79,12 +79,16 @@ func (c *Controller) syncToStdout(key string) error {
 	}
 
 	if !exists {
-		// Below we will warm up our cache with a Database, so that we will see a delete for one Database
-		glog.Infof("Database %s does not exist anymore\n", key)
+		// Below we will warm up our cache with a Miner, so that we will see a delete for one Miner
+		glog.Infof("Miner %s does not exist anymore\n", key)
 	} else {
 		// Note that you also have to check the uid if you have a local controlled resource, which
 		// is dependent on the actual instance, to detect that a Pod was recreated with the same name
-		glog.Infof("Sync/Add/Update for Database %s\n", obj.(*foldingbeautyv1.Database).GetName())
+		glog.Infof("Received a Sync/Add/Update event for Miner %s\n", obj.(*foldingbeautyv1.Miner).GetName())
+		glog.Infof("Miner %s will mine for %s\n", obj.(*foldingbeautyv1.Miner).GetName(), obj.(*foldingbeautyv1.Miner).Spec.Kind)
+		glog.Infof("Miner %s GPU enabled is %t\n", obj.(*foldingbeautyv1.Miner).GetName(), obj.(*foldingbeautyv1.Miner).Spec.Gpu)
+
+		
 	}
 	return nil
 }
@@ -101,7 +105,7 @@ func (c *Controller) handleErr(err error, key interface{}) {
 
 	// This controller retries 5 times if something goes wrong. After that, it stops trying.
 	if c.queue.NumRequeues(key) < 5 {
-		glog.Infof("Error syncing database %v: %v", key, err)
+		glog.Infof("Error syncing Miner %v: %v", key, err)
 
 		// Re-enqueue the key rate limited. Based on the rate limiter on the
 		// queue and the re-enqueue history, the key will be processed later again.
@@ -112,7 +116,7 @@ func (c *Controller) handleErr(err error, key interface{}) {
 	c.queue.Forget(key)
 	// Report to an external entity that, even after several retries, we could not successfully process this key
 	runtime.HandleError(err)
-	glog.Infof("Dropping database %q out of the queue: %v", key, err)
+	glog.Infof("Dropping Miner %q out of the queue: %v", key, err)
 }
 
 func (c *Controller) Run(threadiness int, stopCh chan struct{}) {
@@ -120,7 +124,7 @@ func (c *Controller) Run(threadiness int, stopCh chan struct{}) {
 
 	// Let the workers stop when we are done
 	defer c.queue.ShutDown()
-	glog.Info("Starting Database controller")
+	glog.Info("Starting Miner controller")
 
 	go c.informer.Run(stopCh)
 
@@ -135,7 +139,7 @@ func (c *Controller) Run(threadiness int, stopCh chan struct{}) {
 	}
 
 	<-stopCh
-	glog.Info("Stopping Database controller")
+	glog.Info("Stopping Miner controller")
 }
 
 func (c *Controller) runWorker() {
@@ -164,7 +168,7 @@ func main() {
 	}
 
 	// create the pod watcher
-	databaseListWatcher := cache.NewListWatchFromClient(clientset.FoldingbeautyV1().RESTClient(), "databases", v1.NamespaceDefault, fields.Everything())
+	MinerListWatcher := cache.NewListWatchFromClient(clientset.FoldingbeautyV1().RESTClient(), "Miners", v1.NamespaceDefault, fields.Everything())
 
 	// create the workqueue
 	queue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
@@ -173,7 +177,7 @@ func main() {
 	// whenever the cache is updated, the pod key is added to the workqueue.
 	// Note that when we finally process the item from the workqueue, we might see a newer version
 	// of the Pod than the version which was responsible for triggering the update.
-	indexer, informer := cache.NewIndexerInformer(databaseListWatcher, &foldingbeautyv1.Database{}, 0, cache.ResourceEventHandlerFuncs{
+	indexer, informer := cache.NewIndexerInformer(MinerListWatcher, &foldingbeautyv1.Miner{}, 0, cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			if err == nil {

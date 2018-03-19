@@ -8,8 +8,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// Databases returns a DatabaseInformer.
-	Databases() DatabaseInformer
+	// Miners returns a MinerInformer.
+	Miners() MinerInformer
 }
 
 type version struct {
@@ -23,7 +23,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// Databases returns a DatabaseInformer.
-func (v *version) Databases() DatabaseInformer {
-	return &databaseInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// Miners returns a MinerInformer.
+func (v *version) Miners() MinerInformer {
+	return &minerInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
